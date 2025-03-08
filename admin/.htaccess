@@ -1,0 +1,39 @@
+# Disable directory browsing
+Options -Indexes
+
+# Deny access to .htaccess
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Deny access to files with extensions .ini, .log, .sh, .inc, .bak
+<FilesMatch "\.(ini|log|sh|inc|bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Deny access to includes directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^includes/ - [F,L]
+</IfModule>
+
+# PHP settings
+<IfModule mod_php7.c>
+    # Disallow dangerous functions
+    php_admin_value disable_functions "exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source"
+    
+    # Set maximum upload file size
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    
+    # Set maximum execution time
+    php_value max_execution_time 300
+    
+    # Set maximum input time
+    php_value max_input_time 300
+    
+    # Set memory limit
+    php_value memory_limit 256M
+</IfModule> 
