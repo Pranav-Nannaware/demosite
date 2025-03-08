@@ -473,6 +473,15 @@ include 'includes/header.php';
     </div>
 </section>
 
+<!-- Admin Button Section -->
+<div class="admin-section">
+    <div class="container">
+        <div class="admin-button-container">
+            <a href="admin/" class="admin-btn">Admin Login</a>
+        </div>
+    </div>
+</div>
+
 <?php
 // Include footer
 include 'includes/footer.php';
