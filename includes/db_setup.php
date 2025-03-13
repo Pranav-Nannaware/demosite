@@ -11,6 +11,34 @@ require_once 'config.php';
 // Array to store SQL queries
 $queries = [];
 
+/**************************************
+ * WEBSITE CONTENT TABLES
+ **************************************/
+
+// Create site_content table
+$queries[] = "CREATE TABLE IF NOT EXISTS `site_content` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `content_key` varchar(50) NOT NULL,
+    `title` varchar(100) DEFAULT NULL,
+    `content` text NOT NULL,
+    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `content_key` (`content_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+// Create settings table
+$queries[] = "CREATE TABLE IF NOT EXISTS `settings` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `setting_key` varchar(50) NOT NULL,
+    `setting_value` text NOT NULL,
+    `setting_group` varchar(50) DEFAULT 'general',
+    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `setting_key` (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
 // Create social_links table
 $queries[] = "CREATE TABLE IF NOT EXISTS `social_links` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -36,24 +64,30 @@ $queries[] = "CREATE TABLE IF NOT EXISTS `menu_items` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-// Create site_content table
-$queries[] = "CREATE TABLE IF NOT EXISTS `site_content` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `content_key` varchar(50) NOT NULL,
-    `title` varchar(100) DEFAULT NULL,
-    `content` text NOT NULL,
-    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `content_key` (`content_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-
 // Create quick_links table
 $queries[] = "CREATE TABLE IF NOT EXISTS `quick_links` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `title` varchar(50) NOT NULL,
     `url` varchar(255) NOT NULL,
     `section` varchar(50) NOT NULL,
+    `display_order` int(11) NOT NULL DEFAULT 0,
+    `is_active` tinyint(1) NOT NULL DEFAULT 1,
+    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+/**************************************
+ * HOMEPAGE CONTENT TABLES
+ **************************************/
+
+// Create sliders table
+$queries[] = "CREATE TABLE IF NOT EXISTS `sliders` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `title` varchar(100) NOT NULL,
+    `subtitle` text DEFAULT NULL,
+    `button_text` varchar(50) DEFAULT NULL,
+    `button_url` varchar(255) DEFAULT NULL,
+    `image_path` varchar(255) NOT NULL,
     `display_order` int(11) NOT NULL DEFAULT 0,
     `is_active` tinyint(1) NOT NULL DEFAULT 1,
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -114,20 +148,6 @@ $queries[] = "CREATE TABLE IF NOT EXISTS `testimonials` (
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-// Create sliders table
-$queries[] = "CREATE TABLE IF NOT EXISTS `sliders` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `title` varchar(100) NOT NULL,
-    `subtitle` text DEFAULT NULL,
-    `button_text` varchar(50) DEFAULT NULL,
-    `button_url` varchar(255) DEFAULT NULL,
-    `image` varchar(255) NOT NULL,
-    `display_order` int(11) NOT NULL DEFAULT 0,
-    `is_active` tinyint(1) NOT NULL DEFAULT 1,
-    `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-
 // Create announcements table
 $queries[] = "CREATE TABLE IF NOT EXISTS `announcements` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -139,6 +159,10 @@ $queries[] = "CREATE TABLE IF NOT EXISTS `announcements` (
     `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+/**************************************
+ * USER AND INTERACTION TABLES
+ **************************************/
 
 // Create users table for admin panel
 $queries[] = "CREATE TABLE IF NOT EXISTS `users` (
@@ -197,6 +221,29 @@ if ($success) {
     } catch (PDOException $e) {
         $success = false;
         $error_messages[] = $e->getMessage();
+    }
+}
+
+// Create necessary directories for file uploads
+if ($success) {
+    try {
+        $directories = [
+            '../uploads',
+            '../uploads/sliders',
+            '../uploads/programs',
+            '../uploads/facilities',
+            '../uploads/testimonials',
+            '../uploads/achievements'
+        ];
+        
+        foreach ($directories as $dir) {
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755, true);
+            }
+        }
+    } catch (Exception $e) {
+        $success = false;
+        $error_messages[] = "Error creating directories: " . $e->getMessage();
     }
 }
 

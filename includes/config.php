@@ -55,25 +55,9 @@ function clean($data) {
     return $data;
 }
 
-// Redirect to a URL
-function redirect($url) {
-    header("Location: $url");
-    exit;
-}
-
-// Check if user is logged in
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
-}
-
 // Get current page name
 function getCurrentPage() {
     return basename($_SERVER['PHP_SELF'], '.php');
-}
-
-// Format date
-function formatDate($date, $format = 'd M, Y') {
-    return date($format, strtotime($date));
 }
 
 // Include functions file
